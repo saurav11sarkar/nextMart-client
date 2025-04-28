@@ -1,4 +1,5 @@
 "use client";
+
 import Logo from "@/assets/svgs/Logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,42 +15,41 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { registerSchema } from "./RegisterValidation";
-import { registerUser } from "@/services/authservice";
+import { loginSchema } from "./loginValidation";
+import { loginUser } from "@/services/authservice";
 import { toast } from "sonner";
 
-const RegisterForm = () => {
+const LoginForm = () => {
   const form = useForm({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(loginSchema),
   });
 
   const {
     formState: { isSubmitting },
+    control,
+    handleSubmit,
   } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      const res = await registerUser(data);
-
+      const res = await loginUser(data);
       if (res?.success) {
         toast.success(res?.message);
       } else {
         toast.error(res?.message);
       }
-    } catch (error:any) {
+    //   console.log(res);
+    } catch (error: any) {
       console.error(error);
     }
   };
-
-  const password = form.watch("password");
-  const confirmPassword = form.watch("confirmPassword");
 
   return (
     <div className="border border-gray-200 rounded-2xl grow max-w-md w-full p-8 shadow-lg bg-white">
       <div className="flex items-center gap-4 mb-8">
         <Logo />
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Register</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Login</h1>
           <p className="text-sm text-gray-500">
             Join us today and start exploring the world of AI!
           </p>
@@ -57,29 +57,10 @@ const RegisterForm = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Username */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>User Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your username"
-                    {...field}
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Email */}
           <FormField
-            control={form.control}
+            control={control}
             name="email"
             render={({ field }) => (
               <FormItem>
@@ -89,7 +70,7 @@ const RegisterForm = () => {
                     type="email"
                     placeholder="Enter your email"
                     {...field}
-                    value={field.value || ""}
+                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -99,7 +80,7 @@ const RegisterForm = () => {
 
           {/* Password */}
           <FormField
-            control={form.control}
+            control={control}
             name="password"
             render={({ field }) => (
               <FormItem>
@@ -109,7 +90,7 @@ const RegisterForm = () => {
                     type="password"
                     placeholder="Enter your password"
                     {...field}
-                    value={field.value || ""}
+                    value={field.value ?? ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -117,52 +98,21 @@ const RegisterForm = () => {
             )}
           />
 
-          {/* conform password */}
-
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Comform Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your conform password"
-                    {...field}
-                    value={field.value || ""}
-                  />
-                </FormControl>
-                {confirmPassword &&
-                  password &&
-                  confirmPassword !== password && (
-                    <FormMessage>Password does not match</FormMessage>
-                  )}
-              </FormItem>
-            )}
-          />
-
           {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={Boolean(
-              confirmPassword && password && confirmPassword !== password
-            )}
-            className="w-full"
-          >
-            {isSubmitting ? "Registring..." : "Register"}
+          <Button type="submit" className="w-full">
+            {isSubmitting ? "Logging..." : "Login"}
           </Button>
         </form>
       </Form>
 
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600">
-          Already have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
-            href="/login"
+            href="/register"
             className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
-            Login
+            Register
           </Link>
         </p>
       </div>
@@ -170,4 +120,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
