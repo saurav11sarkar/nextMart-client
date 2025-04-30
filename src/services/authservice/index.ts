@@ -43,7 +43,7 @@ export const loginUser = async (userData: FieldValues) => {
 };
 
 export const getCurrentUser = async () => {
-  const accessToken = (await cookies()).get("accessToken")!.value;
+  const accessToken = (await cookies()).get("accessToken")?.value;
   let decodedData = null;
 
   if (accessToken) {
@@ -52,4 +52,26 @@ export const getCurrentUser = async () => {
   } else {
     return null;
   }
+};
+
+export const reCAPTCHATokenVarivation = async (token: string) => {
+  try {
+    const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        secret: process.env.NEXT_PUBLIC_RECAPTCHA_SERVER_KEY!,
+        response: token,
+      }),
+    });
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const logout = async () => {
+  (await cookies()).delete("accessToken");
 };

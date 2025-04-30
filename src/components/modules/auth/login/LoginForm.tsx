@@ -13,22 +13,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { loginSchema } from "./loginValidation";
-import { loginUser } from "@/services/authservice";
+import { loginUser, reCAPTCHATokenVarivation } from "@/services/authservice";
 import { toast } from "sonner";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const LoginForm = () => {
   const form = useForm({
     resolver: zodResolver(loginSchema),
   });
 
+  const [reCAPTCHATStatas, setReCAPTCHATStatas] = useState<boolean>(false);
+
   const {
     formState: { isSubmitting },
     control,
     handleSubmit,
   } = form;
+
+  const handleReCaptha = async (value: string | null) => {
+    try {
+      const res = await reCAPTCHATokenVarivation(value!);
+      if (res?.success) {
+        setReCAPTCHATStatas(true);
+      }
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
@@ -38,7 +52,7 @@ const LoginForm = () => {
       } else {
         toast.error(res?.message);
       }
-    //   console.log(res);
+      //   console.log(res);
     } catch (error: any) {
       console.error(error);
     }
@@ -98,8 +112,21 @@ const LoginForm = () => {
             )}
           />
 
+          {/* ReCAPTCHA  */}
+          <div className="">
+            <ReCAPTCHA
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_CLIENT_KEY || ""}
+              onChange={handleReCaptha}
+              className="mx-auto"
+            />
+          </div>
+
           {/* Submit Button */}
-          <Button type="submit" className="w-full">
+          <Button
+            disabled={reCAPTCHATStatas ? false : true}
+            type="submit"
+            className="w-full"
+          >
             {isSubmitting ? "Logging..." : "Login"}
           </Button>
         </form>
