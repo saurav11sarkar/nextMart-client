@@ -53,11 +53,11 @@ const Navbar = () => {
             </Link>
           ) : (
             <>
-              <Link href={"/create-shop"}>
-                <Button className="rounded-full" variant={"outline"}>
-                  Create Shop
-                </Button>
-              </Link>
+              {!user?.hasShop && (
+                <Link href={"/create-shop"}>
+                  <Button className="rounded-full">Create Shop</Button>
+                </Link>
+              )}
 
               {/* avator */}
 

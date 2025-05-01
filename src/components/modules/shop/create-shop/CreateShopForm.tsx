@@ -3,6 +3,7 @@
 import Logo from "@/assets/svgs/Logo";
 import { Button } from "@/components/ui/button";
 import NMImageUploder from "@/components/ui/core/NMImageUploder";
+import ImagesPreviewer from "@/components/ui/core/NMImageUploder/ImagesPreviewer";
 import {
   Form,
   FormControl,
@@ -13,20 +14,48 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { createShop } from "@/services/shop";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function CreateShopForm() {
   const form = useForm();
 
   const [imageFiles, setImageFiles] = React.useState<File[] | []>([]);
+  const [imagePreview, setImagePreview] = React.useState<string[] | []>([]);
 
   const {
     formState: { isSubmitting },
   } = form;
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
+    const servicesOffered = data?.servicesOffered
+      .split(",")
+      .map((service: string) => service.trim())
+      .filter((service: string) => service !== "");
+
+    const modifiedData = {
+      ...data,
+      servicesOffered,
+      establishedYear: Number(data?.establishedYear),
+    };
+
+    try {
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(modifiedData));
+      formData.append("logo", imageFiles[0] as File);
+
+      const res = await createShop(formData);
+    
+      if (res?.success) {
+        toast.success(res?.message);
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (error: any) {
+      console.error(error);
+    }
   };
 
   return (
@@ -36,7 +65,9 @@ export default function CreateShopForm() {
         <Logo />
         <div>
           <h1 className="text-2xl font-bold">Create Your Shop</h1>
-          <p className="text-sm text-gray-600">Join us today and start your journey!</p>
+          <p className="text-sm text-gray-600">
+            Join us today and start your journey!
+          </p>
         </div>
       </div>
 
@@ -46,12 +77,18 @@ export default function CreateShopForm() {
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { name: "shopName", label: "Shop Name" },
-              { name: "businessLicenseNumber", label: "Business License Number" },
+              {
+                name: "businessLicenseNumber",
+                label: "Business License Number",
+              },
               { name: "address", label: "Address" },
               { name: "contactNumber", label: "Contact Number" },
               { name: "website", label: "Website" },
               { name: "establishedYear", label: "Established Year" },
-              { name: "taxIdentificationNumber", label: "Tax Identification Number" },
+              {
+                name: "taxIdentificationNumber",
+                label: "Tax Identification Number",
+              },
               { name: "socialMediaLinks.facebook", label: "Facebook" },
               { name: "socialMediaLinks.twitter", label: "Twitter" },
               { name: "socialMediaLinks.instagram", label: "Instagram" },
@@ -96,12 +133,28 @@ export default function CreateShopForm() {
             </div>
             <FormItem>
               <FormLabel>Shop Image</FormLabel>
-              <NMImageUploder imageFiles={imageFiles} setImageFiles={setImageFiles} />
+              {imagePreview.length > 0 ? (
+                <ImagesPreviewer
+                  setImageFiles={setImageFiles}
+                  setImagePreview={setImagePreview}
+                  imagePreview={imagePreview}
+                />
+              ) : (
+                <NMImageUploder
+                  setImageFiles={setImageFiles}
+                  setImagePreview={setImagePreview}
+                  label="Click to upload or drag and drop"
+                />
+              )}
             </FormItem>
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full text-base py-6 mt-4" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full text-base py-6 mt-4"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Creating..." : "Create Shop"}
           </Button>
         </form>

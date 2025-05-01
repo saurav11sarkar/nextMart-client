@@ -1,14 +1,22 @@
 import React from "react";
 import { Input } from "../../input";
-import Image from "next/image";
+import { cn } from "@/lib/utils";
+// import Image from "next/image";
 
 type TImageUploderprops = {
-  imageFiles: File[] | [];
-  setImageFiles: React.Dispatch<React.SetStateAction<File[] | []>>;
+  label?: string;
+  className?: string;
+  setImageFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  setImagePreview: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const NMImageUploader = ({ imageFiles, setImageFiles }: TImageUploderprops) => {
-  const [imagePreview, setImagePreview] = React.useState<string[] | []>([]);
+const NMImageUploader = ({
+  setImageFiles,
+  setImagePreview,
+  label = "Upload Images",
+  className,
+}: TImageUploderprops) => {
+
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files![0];
@@ -21,11 +29,12 @@ const NMImageUploader = ({ imageFiles, setImageFiles }: TImageUploderprops) => {
       };
       reder.readAsDataURL(file);
     }
+
     event.target.value = "";
   };
-  
+
   return (
-    <div className="w-full border border-dashed border-gray-300 rounded-xl p-4 text-center transition hover:border-blue-500 hover:bg-blue-50">
+    <div className={cn("w-full border border-dashed border-gray-300 rounded-xl p-4 text-center transition hover:border-blue-500 hover:bg-blue-50",className)}>
       <label className="flex flex-col items-center justify-center cursor-pointer space-y-2">
         <svg
           className="w-8 h-8 text-gray-500"
@@ -41,7 +50,8 @@ const NMImageUploader = ({ imageFiles, setImageFiles }: TImageUploderprops) => {
           />
         </svg>
         <span className="text-sm text-gray-600">
-          Click to upload or drag and drop
+          {/* Click to upload or drag and drop */}
+          {label}
         </span>
         <Input
           type="file"
@@ -52,11 +62,11 @@ const NMImageUploader = ({ imageFiles, setImageFiles }: TImageUploderprops) => {
           onChange={handleImageChange}
         />
       </label>
-      <div>
+      {/* <div>
         {imagePreview.map((img, index) => (
           <Image key={index} src={img} alt="" width={500} height={500} />
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };
