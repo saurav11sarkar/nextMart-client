@@ -1,12 +1,15 @@
-import ManageCategory from '@/components/modules/shop/category'
-import React from 'react'
+import ManageCategory from "@/components/modules/shop/category";
+import { getAllCategory } from "@/services/category";
+import React from "react";
 
-const ProductCategory = () => {
+const ProductCategory = async () => {
+  const {data,meta} = await getAllCategory();
+  
   return (
     <div>
-        <ManageCategory/>
+      <ManageCategory categories={data} />
     </div>
-  )
-}
+  );
+};
 
-export default ProductCategory
+export default ProductCategory;
