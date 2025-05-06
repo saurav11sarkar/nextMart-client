@@ -1,12 +1,15 @@
-import ManageBrand from '@/components/modules/shop/brand'
-import React from 'react'
+import ManageBrand from "@/components/modules/shop/brand";
+import { getAllBrands } from "@/services/brand";
+import React from "react";
 
-const ProductBrand = () => {
+const ProductBrand = async () => {
+  const {data, meta} = await getAllBrands();
+  console.log(meta);
   return (
     <div>
-        <ManageBrand/>
+      <ManageBrand brand={data} />
     </div>
-  )
-}
+  );
+};
 
-export default ProductBrand
+export default ProductBrand;

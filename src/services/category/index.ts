@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 export const createCategory = async (data: FormData) => {
@@ -11,6 +12,7 @@ export const createCategory = async (data: FormData) => {
       },
       body: data,
     });
+    revalidateTag("CATEGORY");
     // const result = await res.json();
     return res.json();
   } catch (error: any) {
@@ -20,7 +22,29 @@ export const createCategory = async (data: FormData) => {
 
 export const getAllCategory = async () => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/category`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/category`, {
+      next: {
+        tags: ["CATEGORY"],
+      },
+    });
+    return res.json();
+  } catch (error: any) {
+    return Error(error);
+  }
+};
+
+export const deleteCategory = async (categoryId: string): Promise<any> => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API}/category/${categoryId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: (await cookies()).get("accessToken")!.value,
+        },
+      }
+    );
+    revalidateTag("CATEGORY");
     return res.json();
   } catch (error: any) {
     return Error(error);

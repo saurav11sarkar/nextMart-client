@@ -42,7 +42,7 @@ const data = {
       items: [
         {
           title: "Manage Products",
-          url: "/user/shop/all-products",
+          url: "/user/shop/product",
         },
         {
           title: "Manage Categories",
@@ -100,7 +100,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar  collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

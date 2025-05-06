@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "../../input";
 import { cn } from "@/lib/utils";
-// import Image from "next/image";
+
 
 type TImageUploderprops = {
   label?: string;
@@ -62,11 +62,7 @@ const NMImageUploader = ({
           onChange={handleImageChange}
         />
       </label>
-      {/* <div>
-        {imagePreview.map((img, index) => (
-          <Image key={index} src={img} alt="" width={500} height={500} />
-        ))}
-      </div> */}
+     
     </div>
   );
 };

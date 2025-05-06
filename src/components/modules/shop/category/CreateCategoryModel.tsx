@@ -121,7 +121,7 @@ const CreateCategoryModel = () => {
                   <NMImageUploader
                     setImageFiles={setImageFiles}
                     setImagePreview={setImagePreview}
-                    label="Click to upload or drag and drop"
+                    label="Click to upload "
                   />
                 )}
               </FormItem>
