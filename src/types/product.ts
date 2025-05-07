@@ -28,7 +28,7 @@ type Specification = {
     };
     averageRating: number;
     ratingCount: number;
-    availableColors: string[];
+    availableColors: string[] ;
     specification: Specification;
     keyFeatures: string[];
     slug: string;

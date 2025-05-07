@@ -7,17 +7,28 @@ import { Edit, Eye, Plus, Trash } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-// { products }: { products: IProduct[] }
+import { deleteProduct } from "@/services/product";
+import { toast } from "sonner";
 
-const ManageProducts = () => {
+const ManageProducts = ({ products }: { products: IProduct[] }) => {
   const router = useRouter();
 
   const handleView = (product: IProduct) => {
     console.log("Viewing product:", product);
   };
 
-  const handleDelete = (productId: string) => {
-    console.log("Deleting product with ID:", productId);
+  const handleDelete = async (productId: string) => {
+    try {
+      const res = await deleteProduct(productId);
+     
+      if (res?.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    } catch (error: any) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   const columns: ColumnDef<IProduct>[] = [
@@ -84,7 +95,7 @@ const ManageProducts = () => {
             title="Edit"
             onClick={() =>
               router.push(
-                `/user/shop/products/update-product/${row.original._id}`
+                `/user/shop/product/update-product/${row.original._id}`
               )
             }
           >
@@ -116,7 +127,7 @@ const ManageProducts = () => {
           </Button>
         </div>
       </div>
-      {/* <NMTable columns={columns} data={products || []} /> */}
+      <NMTable columns={columns} data={products || []} />
     </div>
   );
 };
