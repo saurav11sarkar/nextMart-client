@@ -17,7 +17,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import Logo from "@/assets/svgs/Logo";
 
@@ -32,6 +32,10 @@ import { IBrand, ICategorys } from "@/types";
 import { useRouter } from "next/navigation";
 import NMImageUploader from "@/components/ui/core/NMImageUploder";
 import ImagesPreviewer from "@/components/ui/core/NMImageUploder/ImagesPreviewer";
+import { getAllCategory } from "@/services/category";
+import { getAllBrands } from "@/services/brand";
+import { addProduct } from "@/services/product";
+import { toast } from "sonner";
 
 export default function AddProductsForm() {
   const [imageFiles, setImageFiles] = useState<File[] | []>([]);
@@ -88,6 +92,18 @@ export default function AddProductsForm() {
     appendSpecification({ key: "", value: "" });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const [categoriesData, brandsData] = await Promise.all([
+        getAllCategory(),
+        getAllBrands(),
+      ]);
+      setCategories(categoriesData?.data);
+      setBrands(brandsData?.data);
+    };
+    fetchData();
+  }, []);
+
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const availableColors = data?.availableColors.map(
       (color: { value: string }) => color.value
@@ -103,9 +119,33 @@ export default function AddProductsForm() {
         (specification[spec.key] = spec.value)
     );
 
+    const modifiedData = {
+      ...data,
+      availableColors,
+      keyFeatures,
+      specification,
+      price: parseFloat(data?.price),
+      stock: parseInt(data?.stock),
+      weight: parseFloat(data?.weight),
+    };
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(modifiedData));
+    if (imageFiles.length || imageFiles.length >= 4) {
+      imageFiles.forEach((file) => formData.append("images", file));
+    }
 
     try {
-      console.log(data);
+      const res = await addProduct(formData);
+      if (res?.success) {
+        toast.success(res.message);
+        form.reset();
+        setImageFiles([]);
+        setImagePreview([]);
+        router.push("/user/shop/product");
+      } else {
+        toast.error(res.message);
+      }
     } catch (error: any) {
       console.error(error);
     }
@@ -162,7 +202,7 @@ export default function AddProductsForm() {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className="w-full">
                       <SelectTrigger>
                         <SelectValue placeholder="Select Product Category" />
                       </SelectTrigger>
@@ -190,7 +230,7 @@ export default function AddProductsForm() {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className="w-full">
                       <SelectTrigger>
                         <SelectValue placeholder="Select Product Brand" />
                       </SelectTrigger>
