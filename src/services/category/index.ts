@@ -13,7 +13,7 @@ export const createCategory = async (data: FormData) => {
       body: data,
     });
     revalidateTag("CATEGORY");
-    // const result = await res.json();
+   
     return res.json();
   } catch (error: any) {
     return Error(error);
@@ -27,7 +27,7 @@ export const getAllCategory = async () => {
         tags: ["CATEGORY"],
       },
     });
-    return res.json();
+    return await res.json();
   } catch (error: any) {
     return Error(error);
   }
